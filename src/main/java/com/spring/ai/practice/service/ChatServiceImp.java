@@ -5,9 +5,12 @@ import com.spring.ai.practice.service.Interface.ChatService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,6 +21,10 @@ import java.util.Map;
 public class ChatServiceImp implements ChatService {
 
     private final ChatClient chatClient;
+
+
+    @Value("classpath:/prompts/User-message.st")
+    private Resource userMessage;
 
     public ChatServiceImp(ChatClient chatClient) {
         this.chatClient = chatClient;
@@ -72,9 +79,12 @@ public class ChatServiceImp implements ChatService {
         return entity;
     }
 
+
+    //In Mockito Test - not controller
     @Override
     public String chatTemplate(){
 
+//        A PromptTemplate is the dynamic input you send as a user.
         //first Step
         PromptTemplate build = PromptTemplate
                 .builder()
@@ -90,10 +100,44 @@ public class ChatServiceImp implements ChatService {
 
         Prompt prompt = new Prompt(renderedMessage);
 
-        return this.chatClient
-                .prompt(prompt)
+        //another Method - using systemPromptTemplate -A System Prompt Template defines the behavior, tone, and rules of the AI.
+
+        var systemPromptTemplate = SystemPromptTemplate
+                .builder()
+                .template("You are an senior backend Engineer.")
+                .build();
+
+        var systemMessage = systemPromptTemplate.createMessage();
+
+        var userPromptTemplate = PromptTemplate.builder()
+                .template("What is {techName} ? tell me the example of {exampleName}")
+                .build();
+        var userMessage = userPromptTemplate.createMessage(Map.of(
+                "techName", "Spring",
+                "exampleName", "Spring Boot"
+        ));
+
+        //we need to combine system and user prompt
+
+        Prompt prompt1 = new Prompt(systemMessage, userMessage);
+
+//        return this.chatClient
+//                .prompt(prompt1)
+//                .call()
+//                .content();
+
+        //Another Method using fluent ChatClient
+
+        return chatClient.prompt()
+                .system(system -> system.text("You are an senior backend Engineer."))
+//                .user(user -> user.text("What is {techName} ? tell me the example of {exampleName}")
+//                        .param("techName", "Spring")
+//                        .param("exampleName", "Spring Boot"))
+                .user(user -> user.text(this.userMessage).param("techName", "Spring").param("exampleName", "Spring Boot"))
                 .call()
                 .content();
+
+
     }
 
 
