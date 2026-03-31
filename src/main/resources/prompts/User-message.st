@@ -1,1 +1,1 @@
-What is {techName} ? tell me the example of {exampleName}
+Give me Detailed information in bullet point about {Question}

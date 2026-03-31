@@ -14,26 +14,26 @@ public class SingleModelController {
 
     //****First enable ChatClient from property file
 
-//        private ChatClient chatClient;
-//
-//
-//        public SingleModelController(ChatClient.Builder builder){
-//            this.chatClient = builder.build();
-//        }
-//
-//        @GetMapping("/chat")
-//        public ResponseEntity<String> chat(
-//                @RequestParam(
-//                        value = "q",
-//                        required = true
-//                )
-//                String q
-//        ){
-//            var resultResponse = chatClient
-//                    .prompt(q)
-//                    .call()
-//                    .content();
-//            return new ResponseEntity<>(resultResponse, HttpStatus.OK);
-//        }
+        private ChatClient chatClient;
+
+
+        public SingleModelController(ChatClient.Builder builder){
+            this.chatClient = builder.build();
+        }
+
+        @GetMapping("/chat")
+        public ResponseEntity<String> chat(
+                @RequestParam(
+                        value = "q",
+                        required = true
+                )
+                String q
+        ){
+            var resultResponse = chatClient
+                    .prompt(q)
+                    .call()
+                    .content();
+            return new ResponseEntity<>(resultResponse, HttpStatus.OK);
+        }
     }
 

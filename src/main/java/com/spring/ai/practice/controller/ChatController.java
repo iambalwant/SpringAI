@@ -50,6 +50,6 @@ public class ChatController {
             String q
     ){
 
-           return new ResponseEntity<>(chatService.chat(q), HttpStatus.OK);
+           return new ResponseEntity<>(chatService.advisor(q), HttpStatus.OK);
     }
 }

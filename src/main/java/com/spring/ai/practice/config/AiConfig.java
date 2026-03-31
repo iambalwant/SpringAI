@@ -1,12 +1,17 @@
 package com.spring.ai.practice.config;
 
 
+import com.spring.ai.practice.advisors.TokenPrintAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.ollama.OllamaChatModel;
 //import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class AiConfig {
@@ -15,6 +20,10 @@ public class AiConfig {
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder){
         return builder
+                .defaultAdvisors(new TokenPrintAdvisor(),
+                                 new SimpleLoggerAdvisor(),
+                                 new SafeGuardAdvisor(List.of("porn"))
+                )
                 .defaultSystem("you are a helpful as coding assistant. you are expert in backend engineering")
                 .defaultOptions(
                         OllamaChatOptions.builder()

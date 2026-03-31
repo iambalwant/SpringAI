@@ -3,6 +3,7 @@ package com.spring.ai.practice.service;
 import com.spring.ai.practice.entity.Tut;
 import com.spring.ai.practice.service.Interface.ChatService;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
@@ -26,6 +27,9 @@ public class ChatServiceImp implements ChatService {
     @Value("classpath:/prompts/User-message.st")
     private Resource userMessage;
 
+    @Value("classpath:/prompts/System-message.st")
+    private Resource systemMessage;
+
     public ChatServiceImp(ChatClient chatClient) {
         this.chatClient = chatClient;
     }
@@ -37,7 +41,7 @@ public class ChatServiceImp implements ChatService {
 //                        .build())
 //                .build();
 //    }
-
+//Chatclinet
     @Override
     public String chat(String query) {
 
@@ -79,7 +83,7 @@ public class ChatServiceImp implements ChatService {
         return entity;
     }
 
-
+//PromptTemplate
     //In Mockito Test - not controller
     @Override
     public String chatTemplate(){
@@ -140,5 +144,18 @@ public class ChatServiceImp implements ChatService {
 
     }
 
-
+//Advisor
+    @Override
+    public String advisor(String query){
+        return chatClient
+                .prompt()
+//                .advisors(new SimpleLoggerAdvisor()) ~ this way or in bean
+                .system(system -> system.text(this.systemMessage))
+//                .user(user -> user.text("What is {techName} ? tell me the example of {exampleName}")
+//                        .param("techName", "Spring")
+//                        .param("exampleName", "Spring Boot"))
+                .user(user -> user.text(this.userMessage).param("Question", query))
+                .call()
+                .content();
+    }
 }
