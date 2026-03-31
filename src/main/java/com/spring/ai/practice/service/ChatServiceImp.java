@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
@@ -157,5 +158,18 @@ public class ChatServiceImp implements ChatService {
                 .user(user -> user.text(this.userMessage).param("Question", query))
                 .call()
                 .content();
+    }
+
+    @Override
+    public Flux<String> streamChat(String query) {
+
+         return this.chatClient.prompt()
+                 .system(system -> system.text(
+                         this.systemMessage
+                 ))
+                 .user(user->user.text(this.userMessage).param("Question",query))
+                 .stream()
+                 .content();
+
     }
 }

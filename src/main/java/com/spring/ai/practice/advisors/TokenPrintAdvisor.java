@@ -22,7 +22,6 @@ public class TokenPrintAdvisor implements CallAdvisor, StreamAdvisor {
 
         this.logger.info("Request " + chatClientRequest.prompt().getContents());
 
-
         ChatClientResponse chatClientResponse = callAdvisorChain.nextCall(chatClientRequest);
 
         this.logger.info("Responce Recive from the model ");
@@ -35,7 +34,10 @@ public class TokenPrintAdvisor implements CallAdvisor, StreamAdvisor {
 
     @Override
     public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest, StreamAdvisorChain streamAdvisorChain) {
-        return null;
+
+        Flux<ChatClientResponse> chatClientResponseFlux = streamAdvisorChain.nextStream(chatClientRequest);
+
+        return chatClientResponseFlux;
     }
 
     @Override
