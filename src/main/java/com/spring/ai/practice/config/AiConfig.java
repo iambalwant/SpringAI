@@ -2,9 +2,13 @@ package com.spring.ai.practice.config;
 
 
 import com.spring.ai.practice.advisors.TokenPrintAdvisor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.ollama.OllamaChatModel;
 //import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
@@ -16,11 +20,21 @@ import java.util.List;
 @Configuration
 public class AiConfig {
 
+    Logger logger = LoggerFactory.getLogger(AiConfig.class);
+
     //we can do this way to set parameters
     @Bean
-    public ChatClient chatClient(ChatClient.Builder builder){
+    public ChatClient chatClient(ChatClient.Builder builder, ChatMemory chatMemory){
+
+        this.logger.info("Chat memory :" + chatMemory.getClass().getName());
+
+        MessageChatMemoryAdvisor messageChatMemoryAdvisor = MessageChatMemoryAdvisor
+                .builder(chatMemory)
+                .build();
+
         return builder
-                .defaultAdvisors(new TokenPrintAdvisor(),
+                .defaultAdvisors(messageChatMemoryAdvisor,
+                                 new TokenPrintAdvisor(),
                                  new SimpleLoggerAdvisor(),
                                  new SafeGuardAdvisor(List.of("porn"))
                 )

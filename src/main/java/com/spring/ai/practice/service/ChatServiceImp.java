@@ -4,6 +4,7 @@ import com.spring.ai.practice.entity.Tut;
 import com.spring.ai.practice.service.Interface.ChatService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
@@ -155,6 +156,17 @@ public class ChatServiceImp implements ChatService {
 //                .user(user -> user.text("What is {techName} ? tell me the example of {exampleName}")
 //                        .param("techName", "Spring")
 //                        .param("exampleName", "Spring Boot"))
+                .user(user -> user.text(this.userMessage).param("Question", query))
+                .call()
+                .content();
+    }
+
+    @Override
+    public String chatMemory(String query, String userId) {
+        return chatClient
+                .prompt()
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, userId)) //chat_memory_conversation_id from chatMemory
+                .system(system -> system.text(this.systemMessage))
                 .user(user -> user.text(this.userMessage).param("Question", query))
                 .call()
                 .content();
