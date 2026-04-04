@@ -1,5 +1,6 @@
 package com.spring.ai.practice;
 
+import com.spring.ai.practice.helper.Helper;
 import com.spring.ai.practice.service.Interface.ChatService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,14 @@ class ApplicationTests {
 
 		var output = this.chatService.chatTemplate();
 		System.out.println(output);
+	}
+
+	@Test
+    void saveDataToVectorDatabase(){
+		System.out.println("saving data to database");
+		this.chatService.saveData(Helper.getData());
+		System.out.println("saving data to database done");
+
 	}
 
 }

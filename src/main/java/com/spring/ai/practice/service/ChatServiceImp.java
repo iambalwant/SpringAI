@@ -8,8 +8,11 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
@@ -18,6 +21,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -32,7 +36,10 @@ public class ChatServiceImp implements ChatService {
     @Value("classpath:/prompts/System-message.st")
     private Resource systemMessage;
 
-    public ChatServiceImp(ChatClient chatClient) {
+    private VectorStore vectorStore;
+
+    public ChatServiceImp(ChatClient chatClient, VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
         this.chatClient = chatClient;
     }
 //sending parameter with constructor or make in config or in prompt object or in yml/property file
@@ -182,6 +189,15 @@ public class ChatServiceImp implements ChatService {
                  .user(user->user.text(this.userMessage).param("Question",query))
                  .stream()
                  .content();
+
+    }
+//running this on test
+    @Override
+    public void saveData(List<String> list) {
+
+        List<Document> documentList = list.stream().map(Document::new).toList();
+        this.vectorStore.add(documentList);
+
 
     }
 }

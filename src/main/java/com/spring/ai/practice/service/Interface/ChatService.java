@@ -12,4 +12,6 @@ public interface ChatService {
     String advisor(String query);
     String chatMemory(String query, String userId);
     Flux<String> streamChat(String query);
+    //to dump the data into vector database
+    void saveData(List<String> list);
 }

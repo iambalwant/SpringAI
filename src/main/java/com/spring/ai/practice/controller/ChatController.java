@@ -57,4 +57,11 @@ public class ChatController {
     ){
         return new ResponseEntity<>(this.chatService.streamChat(query), HttpStatus.OK);
     }
+
+    @GetMapping("/rag-chat")
+    public ResponseEntity<Flux<String>> ragChat(
+            @RequestParam("q") String query
+    ){
+        return new ResponseEntity<>(this.chatService.streamChat(query), HttpStatus.OK);
+    }
 }
