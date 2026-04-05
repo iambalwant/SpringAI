@@ -10,6 +10,9 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -179,6 +182,28 @@ public class ChatServiceImp implements ChatService {
     }
 
     @Override
+    public Flux<String> streamChat(String query) {
+
+        return this.chatClient.prompt()
+                .system(system -> system.text(
+                        this.systemMessage
+                ))
+                .user(user->user.text(this.userMessage).param("Question",query))
+                .stream()
+                .content();
+
+    }
+
+    //running this on test and save data into vector db
+    @Override
+    public void saveData(List<String> list) {
+
+        List<Document> documentList = list.stream().map(Document::new).toList();
+        this.vectorStore.add(documentList);
+
+
+    }
+    @Override
     public String ragChat(String query, String userId) {
 
         //load data from vector data base
@@ -227,26 +252,31 @@ public class ChatServiceImp implements ChatService {
                 .call()
                 .content();
     }
-
+    //RetrievalAugmentationAdvisor
     @Override
-    public Flux<String> streamChat(String query) {
+    public String ragChatRetrievalAugmentationAdvisor(String query, String userId) {
 
-         return this.chatClient.prompt()
-                 .system(system -> system.text(
-                         this.systemMessage
-                 ))
-                 .user(user->user.text(this.userMessage).param("Question",query))
-                 .stream()
-                 .content();
+        var advisor = RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(
+                        VectorStoreDocumentRetriever.builder()
+                                .vectorStore(vectorStore)
+                                .topK(3)
+                                .similarityThreshold(0.5)
+                                .build()
+                )
+                .queryAugmenter(ContextualQueryAugmenter
+                        .builder()
+                        .allowEmptyContext(true)
+//                        .promptTemplate() //if you don't want to use default prompt template
+                        .build())
+                .build();
 
-    }
-//running this on test and save data into vector db
-    @Override
-    public void saveData(List<String> list) {
 
-        List<Document> documentList = list.stream().map(Document::new).toList();
-        this.vectorStore.add(documentList);
-
-
+        return chatClient
+                .prompt()
+                .advisors(advisor)
+                .user(user -> user.text(this.userMessage).param("query", query))
+                .call()
+                .content();
     }
 }

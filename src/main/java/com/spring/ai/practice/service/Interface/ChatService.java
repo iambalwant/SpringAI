@@ -18,4 +18,7 @@ public interface ChatService {
     Flux<String> streamChat(String query);
     //to dump the data into vector database
     void saveData(List<String> list);
+
+    //QuestionAnswerAdvisor
+    String ragChatRetrievalAugmentationAdvisor(String query, String userId);
 }

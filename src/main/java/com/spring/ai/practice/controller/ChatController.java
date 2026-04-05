@@ -66,6 +66,9 @@ public class ChatController {
             ) String q,
             @RequestHeader("userId") String userID
     ){
-        return new ResponseEntity<>(chatService.ragChatQuestionAnserAdvicsor(q, userID), HttpStatus.OK);
+//        return new ResponseEntity<>(chatService.ragChat(q, userID), HttpStatus.OK);
+//        return new ResponseEntity<>(chatService.ragChatQuestionAnserAdvicsor(q, userID), HttpStatus.OK);
+        return new ResponseEntity<>(chatService.ragChatRetrievalAugmentationAdvisor(q, userID), HttpStatus.OK);
+
     }
 }
