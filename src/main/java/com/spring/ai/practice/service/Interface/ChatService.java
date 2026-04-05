@@ -11,6 +11,10 @@ public interface ChatService {
     String chatTemplate();
     String advisor(String query);
     String chatMemory(String query, String userId);
+    String ragChat(String query, String userId);
+
+    String ragChatQuestionAnserAdvicsor(String query, String userId);
+
     Flux<String> streamChat(String query);
     //to dump the data into vector database
     void saveData(List<String> list);

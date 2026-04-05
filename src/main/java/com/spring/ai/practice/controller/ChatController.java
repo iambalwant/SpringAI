@@ -59,9 +59,13 @@ public class ChatController {
     }
 
     @GetMapping("/rag-chat")
-    public ResponseEntity<Flux<String>> ragChat(
-            @RequestParam("q") String query
+    public ResponseEntity<String> ragChat(
+            @RequestParam(
+                    value = "q",
+                    required = true
+            ) String q,
+            @RequestHeader("userId") String userID
     ){
-        return new ResponseEntity<>(this.chatService.streamChat(query), HttpStatus.OK);
+        return new ResponseEntity<>(chatService.ragChatQuestionAnserAdvicsor(q, userID), HttpStatus.OK);
     }
 }

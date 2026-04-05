@@ -1,1 +1,2 @@
-Give me Detailed information in bullet point about {Question}
+User query:
+{query}
